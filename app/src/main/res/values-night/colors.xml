@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tag_text_color">@color/md_theme_dark_onPrimary</color>
+</resources>

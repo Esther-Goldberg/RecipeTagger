@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/document_list_item"
+    style="@style/Widget.Material3.CardView.Outlined"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/slim_padding"
+    android:background="?attr/colorSecondaryContainer"
+    tools:showIn="@layout/content_main">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/document_list_item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_padding"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/document_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/standard_padding"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp" />
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/tags_flow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/slim_padding"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/slim_padding"
+            app:flow_horizontalGap="@dimen/slim_padding"
+            app:flow_horizontalStyle="packed"
+            app:flow_verticalGap="@dimen/tiny_padding"
+            app:flow_wrapMode="chain2"
+            app:flow_horizontalAlign="start"
+            app:flow_horizontalBias="0"
+            app:constraint_referenced_ids="document_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
