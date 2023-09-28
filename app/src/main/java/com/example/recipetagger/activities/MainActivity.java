@@ -1,10 +1,13 @@
 package com.example.recipetagger.activities;
 
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+
 import android.app.SearchManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,11 +20,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.example.recipetagger.classes.OnItemClickListener;
+import com.example.recipetagger.interfaces.OnItemClickListener;
 import com.example.recipetagger.classes.RecipeListItemAdapter;
 import com.example.recipetagger.databinding.ActivityMainBinding;
 import com.example.recipetagger.db.DocumentsContract.DocumentEntry;
@@ -35,14 +39,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
-import java.util.Objects;
-
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private String mQuery;
+    private String mQuery = null;
+    private final String QUERY = "QUERY";
     private DBHelper mDBHelper;
     private ContentResolver mResolver;
     private RecipeListItemAdapter mAdapter;
+
+    private boolean mUseListView;
+    private String mKEY_LAYOUT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +63,35 @@ public class MainActivity extends AppCompatActivity {
 
         mDBHelper = new DBHelper(getApplicationContext());
         mResolver = getContentResolver();
+        mKEY_LAYOUT = getString(R.string.layout_key);
+
+        if (savedInstanceState != null) {
+            mQuery = savedInstanceState.getString(QUERY);
+        }
+
+        saveOrRestoreSettings();
 
         handleIntent(getIntent());
-
-        //TODO: remove or not showDocumentsList();
+        showDocumentsList();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleIntent(intent);
+        showDocumentsList();
     }
 
     private void handleIntent(@NonNull Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
-        } else {
-            mQuery = null;
         }
-        showDocumentsList();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(QUERY, mQuery);
     }
 
     private void openDocumentPicker() {
@@ -123,7 +139,19 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> settingsLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            result -> saveSettings());
+            result -> saveOrRestoreSettings());
+
+    private void saveOrRestoreSettings() {
+        SharedPreferences sp = getDefaultSharedPreferences(this);
+        boolean oldLayout = mUseListView;
+        mUseListView = sp.getBoolean(mKEY_LAYOUT, true);
+
+        // redo displaying the activity if it's already displayed the other way
+        if ((oldLayout != mUseListView) && (mAdapter != null) ) {
+            showDocumentsList();
+        }
+
+    }
 
     ActivityResultLauncher<Intent> documentPickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -133,14 +161,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-    private void saveSettings() {
-    }
-
     private void showDocumentsList() {
         mAdapter = new RecipeListItemAdapter(mQuery, mDBHelper);
         mAdapter.setOnItemClickListener(getNewOnItemClickListener());
         RecyclerView rvDocuments  = binding.contentMain.recipeList;
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+
+        RecyclerView.LayoutManager layoutManager;
+
+        if (mUseListView) {
+            layoutManager = new LinearLayoutManager(this);
+        } else {
+            layoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.num_cols));
+        }
+
         rvDocuments.setLayoutManager(layoutManager);
         rvDocuments.setAdapter(mAdapter);
     }
@@ -181,18 +214,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private OnItemClickListener getNewOnItemClickListener() {
-        return (position, view) -> {
-            openDocument (mAdapter.getDocAtPosition(position));
-        };
+        return (position, view) -> openDocument (mAdapter.getDocAtPosition(position));
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 }

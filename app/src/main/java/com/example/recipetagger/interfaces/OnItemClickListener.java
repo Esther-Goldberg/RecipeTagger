@@ -1,4 +1,4 @@
-package com.example.recipetagger.classes;
+package com.example.recipetagger.interfaces;
 
 import android.view.View;
 

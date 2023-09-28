@@ -1,6 +1,5 @@
 package com.example.recipetagger.classes;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,7 +7,6 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +18,7 @@ import com.example.recipetagger.db.DBHelper;
 import com.example.recipetagger.db.DocumentsContract.TagEntry;
 import com.example.recipetagger.db.DocumentsContract.DocumentEntry;
 import com.example.recipetagger.db.DocumentsContract.DocumentTagEntry;
+import com.example.recipetagger.interfaces.OnItemClickListener;
 import com.example.recipetagger.models.DocumentModel;
 import com.example.recipetagger.models.TagModel;
 
@@ -130,12 +129,6 @@ public class RecipeListItemAdapter extends RecyclerView.Adapter<RecipeListItem> 
             Activity activity = (Activity) holder.docListItem.getContext();
             TextView tvTag = new TextView(activity);
             tvTag.setBackground(ResourcesCompat.getDrawable(holder.docListItem.getResources(), R.drawable.tag_image, activity.getTheme()));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            lp.setMargins(0, 0, 16, 0);
-            tvTag.setLayoutParams(lp);
             tvTag.setText(tag.getTagName());
             tvTag.setTextColor(activity.getColor(R.color.tag_text_color));
             tvTag.setOnClickListener(v -> activity.triggerSearch(tag.getTagName(), null));

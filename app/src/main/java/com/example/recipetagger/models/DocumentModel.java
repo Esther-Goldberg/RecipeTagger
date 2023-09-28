@@ -2,7 +2,7 @@ package com.example.recipetagger.models;
 
 import android.net.Uri;
 
-import com.example.recipetagger.utils.AbstractJsonSerializer;
+import com.example.recipetagger.utils.UriJsonSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -47,13 +47,13 @@ public class DocumentModel {
 
     public String getJson() {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Uri.class, new AbstractJsonSerializer()).create();
+                .registerTypeAdapter(Uri.class, new UriJsonSerializer()).create();
         return gson.toJson(this);
     }
 
     public static DocumentModel getDocumentFromJson(String jsonDocumentModel) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Uri.class, new AbstractJsonSerializer()).create();
+                .registerTypeAdapter(Uri.class, new UriJsonSerializer()).create();
         return gson.fromJson(jsonDocumentModel, DocumentModel.class);
     }
 

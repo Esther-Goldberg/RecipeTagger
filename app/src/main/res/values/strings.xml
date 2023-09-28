@@ -24,4 +24,8 @@
     <string name="enter_tag_here">enter tag here, then press enter</string>
     <string name="save">Save</string>
     <string name="search_hint">search tags</string>
+    <string name="appearance">Appearance</string>
+    <string name="grid_view">use a grid layout for recipe searches</string>
+    <string name="list_view">Use a list layout for recipe searches</string>
+    <string name="layout_key">layout_key</string>
 </resources>

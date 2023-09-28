@@ -1,8 +1,6 @@
 package com.example.recipetagger.activities;
 
-import android.app.SearchManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,17 +19,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.helper.widget.Flow;
 import androidx.core.content.res.ResourcesCompat;
 
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.recipetagger.databinding.ActivityDocumentViewerBinding;
 
 import com.example.recipetagger.R;
-import com.example.recipetagger.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -41,7 +35,6 @@ public class DocumentViewerActivity extends AppCompatActivity {
     private ActivityDocumentViewerBinding binding;
 
     DocumentModel mDocument;
-    ArrayList<TagModel> mTagsList;
     Flow mTagsBar;
     final String CURRENT_PAGE = "current_page";
     DBHelper mDBHelper;
@@ -69,8 +62,14 @@ public class DocumentViewerActivity extends AppCompatActivity {
             binding.contentDocumentViewer.pdfView.fromUri(mDocument.getDocUri()).load();
             displayDocumentTags();
             binding.toolbar.setTitle(mDocument.getDocName());
+        } else if (savedInstanceState != null) {
+            mDocument = DocumentModel.getDocumentFromJson(savedInstanceState.getString("DOCUMENT"));
+            int currentPage = savedInstanceState.getInt(CURRENT_PAGE);
+            binding.contentDocumentViewer.pdfView
+                    .fromUri(mDocument.getDocUri())
+                    .defaultPage(currentPage)
+                    .load();
         }
-
     }
 
     private void displayDocumentTags() {
@@ -81,12 +80,6 @@ public class DocumentViewerActivity extends AppCompatActivity {
 
             TextView tvTag = new TextView(this);
             tvTag.setBackground(ResourcesCompat.getDrawable(this.getResources(), R.drawable.tag_image, this.getTheme()));
-             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            lp.setMargins(8, 8, 8, 8);
-            tvTag.setLayoutParams(lp);
             tvTag.setText(tag.getTagName());
             tvTag.setTextColor(getColor(R.color.tag_text_color));
             //TODO: make this work eventually tvTag.setOnClickListener(v -> triggerSearch(tag.getTagName(), null));
@@ -100,7 +93,7 @@ public class DocumentViewerActivity extends AppCompatActivity {
 
     private void resetTagsLayout() {
         if (numTagsOld > 0) {
-            binding.contentDocumentViewer.contentDocumentViewer.removeViews(2, numTagsOld + 1);
+            binding.contentDocumentViewer.contentDocumentViewer.removeViews(2, numTagsOld);
         }
     }
 
@@ -154,17 +147,6 @@ public class DocumentViewerActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(CURRENT_PAGE, binding.contentDocumentViewer.pdfView.getCurrentPage() );
         outState.putString("DOCUMENT", mDocument.getJson());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mDocument = DocumentModel.getDocumentFromJson(savedInstanceState.getString("DOCUMENT"));
-        int currentPage = savedInstanceState.getInt(CURRENT_PAGE);
-        binding.contentDocumentViewer.pdfView
-                .fromUri(mDocument.getDocUri())
-                .defaultPage(currentPage)
-                .load();
     }
 
     @Override
